@@ -1,7 +1,3 @@
-# Updates to calculation code to make it work for non-AIM data
-# Anna Knight, aknight@usgs.gov
-# Last updated: 12 Sept 2019
-
 #' Line-point intercept indicator calculations
 #' @description Calculate the percent cover by plot, and optionally line and year,
 #' for ground cover, total foliar cover, and a suite of plant traits including
