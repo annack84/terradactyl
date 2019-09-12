@@ -96,12 +96,22 @@ pct_cover <- function(lpi_tall,
   # Within a plot, we need the number of pin drops, which we'll calculate
   # taking the unique combination of PrimaryKey, LineKey and Point number
   # for each group level
-  point_totals <- dplyr::distinct(
-    .data = lpi_tall,
-    PrimaryKey, LineKey, PointNbr, Year
-  ) %>%
-    dplyr::group_by(!!!level) %>%
-    dplyr::summarize(point_count = dplyr::n())
+  if(by_year){
+    point_totals <- dplyr::distinct(
+      .data = lpi_tall,
+      PrimaryKey, LineKey, PointNbr, Year
+    ) %>%
+      dplyr::group_by(!!!level) %>%
+      dplyr::summarize(point_count = dplyr::n())
+  }
+  if(!by_year){
+    point_totals <- dplyr::distinct(
+      .data = lpi_tall,
+      PrimaryKey, LineKey, PointNbr
+    ) %>%
+      dplyr::group_by(!!!level) %>%
+      dplyr::summarize(point_count = dplyr::n())
+  }
 
   # Add the point_counts field
   # (it'll be the same for every record associated with a plot)
@@ -141,10 +151,15 @@ pct_cover <- function(lpi_tall,
                       summary <- lpi_tall %>%
                         # Remove records where there are NAs for the grouping variables
                         dplyr::filter(complete.cases(!!!grouping_variables)) %>%
-                        dplyr::group_by(
+                        {if(by_year){ dplyr::group_by(.,
                           PrimaryKey, LineKey, PointNbr, Year, point_count,
-                          !!!grouping_variables
-                        ) %>%
+                          !!!grouping_variables)
+                          }else{
+                          dplyr::group_by(.,
+                            PrimaryKey, LineKey, PointNbr, point_count,
+                            !!!grouping_variables)
+                          }
+                        }%>%
                         ## Here's the breakdown of the gnarly parts:
                         # Because this is a tall format, we want just
                         # presence/absence for the indicator at a given point
@@ -163,10 +178,14 @@ pct_cover <- function(lpi_tall,
                     "first" = {
                       summary <- lpi_tall %>%
                         # Remove records where there are NAs for the grouping variables
-                        # dplyr::filter(complete.cases(!!!grouping_variables))%>%
+                        dplyr::filter(complete.cases(!!!grouping_variables))%>%
                         # Strip out all the non-hit codes
                         dplyr::filter(!(code %in% c("", NA, "None", "N"))) %>%
-                        dplyr::group_by(PrimaryKey, LineKey, PointNbr, Year, point_count) %>%
+                        {if(by_year){ dplyr::group_by(., PrimaryKey, LineKey, PointNbr, Year, point_count)
+                          }else{
+                          dplyr::group_by(., PrimaryKey, LineKey, PointNbr, point_count)
+                            }
+                        }%>%
                         # Get the first hit at a point
                         dplyr::summarize(code = dplyr::first(code)) %>%
                         # Get all the other fields back
