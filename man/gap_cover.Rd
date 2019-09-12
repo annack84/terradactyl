@@ -5,7 +5,7 @@
 \title{Calculate the number, length, and percent of gaps}
 \usage{
 gap_cover(gap_tall, tall = FALSE, breaks = c(20, 25, 51, 100, 200),
-  type = "canopy", by_line = FALSE)
+  type = "canopy", by_line = FALSE, by_year = FALSE)
 }
 \arguments{
 \item{gap_tall}{Raw tables as imported from TerrADat use gather_gap .}
@@ -18,10 +18,13 @@ on that plot. Defaults to \code{FALSE}.}
 \item{breaks}{Vector of all break values. Defaults to \code{20,25, 51, 100, 200}}
 
 \item{type}{String. Specifies the type of gap calculation
-\code{"canopy", "basal", "perennial canopy"}}
-
-\item{by_line}{Logical. If \code{TRUR} then results will be reported further
+\code{"canopy", "basal", "perennial canopy"}
+#' @param by_line Logical. If \code{TRUE} then results will be reported further
 grouped by line using the \code{LineKey} field from the data forms.
+Defaults to \code{FALSE}.}
+
+\item{by_year}{Logical. If \code{TRUE} then results will be reported further
+grouped by year using the \code{FormDate} field from the data forms.
 Defaults to \code{FALSE}.}
 }
 \description{

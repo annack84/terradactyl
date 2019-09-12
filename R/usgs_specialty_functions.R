@@ -19,7 +19,7 @@
 #' @param by_year Logical. If \code{TRUE} then results will be reported further
 #' grouped by year using the \code{FormDate} field from the data forms.
 #' Defaults to \code{TRUE}.
-#' @return A data frame of indicator values
+#' @return A \code{tbl} of indicators of either tall or wide format.
 
 
 # Calculate the LPI indicators
