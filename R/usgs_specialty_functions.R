@@ -24,6 +24,7 @@
 
 # Calculate the LPI indicators
 #' @export lpi_calc_usgs
+#' @rdname usgs_specialty_functions
 lpi_calc_usgs <- function(header,
                           lpi_tall,
                           species_file,
