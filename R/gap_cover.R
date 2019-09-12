@@ -5,12 +5,15 @@
 #' rather than wide and will not have observations for non-existent values e.g.,
 #' if no data fell into a group on a plot, there will be no row for that group
 #' on that plot. Defaults to \code{FALSE}.
-#' @param by_line Logical. If \code{TRUR} then results will be reported further
-#' grouped by line using the \code{LineKey} field from the data forms.
-#' Defaults to \code{FALSE}.
 #' @param breaks Vector of all break values. Defaults to \code{20,25, 51, 100, 200}
 #' @param type String. Specifies the type of gap calculation
 #' \code{"canopy", "basal", "perennial canopy"}
+#' #' @param by_line Logical. If \code{TRUE} then results will be reported further
+#' grouped by line using the \code{LineKey} field from the data forms.
+#' Defaults to \code{FALSE}.
+#' @param by_year Logical. If \code{TRUE} then results will be reported further
+#' grouped by year using the \code{FormDate} field from the data forms.
+#' Defaults to \code{FALSE}.
 #' @export
 
 
@@ -22,12 +25,24 @@ gap_cover <- function(gap_tall,
                       tall = FALSE,
                       breaks = c(20, 25, 51, 100, 200),
                       type = "canopy",
-                      by_line = FALSE){
+                      by_line = FALSE,
+                      by_year = FALSE){
+  # Create a year variable to group by for by_year = T
+  if(by_year){
+    gap_tall$Year <- lubridate::year(gap_tall$FormDate)
+  }
 
-  # For how deep to group. Always by plot, sometimes by line
-  if (by_line) {
+  # For how deep to group. Always by plot, sometimes by line, sometimes by year
+  if (by_line & !by_year) {
     level <- rlang::quos(PrimaryKey, LineKey)
-  } else {
+  }
+  if(by_line & by_year){
+    level <- rlang::quos(PrimaryKey, LineKey, Year)
+  }
+  if(!by_line & by_year){
+    level <- rlang::quos(PrimaryKey, Year)
+  }
+  if(!by_line & !by_year) {
     level <- rlang::quos(PrimaryKey)
   }
 
@@ -44,12 +59,12 @@ gap_cover <- function(gap_tall,
     gap_tall$LineLengthAmount[gap_tall$Measure == 2] <-
       gap_tall$LineLengthAmount[gap_tall$Measure == 2] * 2.54 * 12
 
-     # Convert Gap from inches to centimeters
-     gap_tall$Gap[gap_tall$Measure == 2] <-
+    # Convert Gap from inches to centimeters
+    gap_tall$Gap[gap_tall$Measure == 2] <-
       gap_tall$Gap[gap_tall$Measure == 2] * 2.54
 
-      # Convert GapMin from inches to centimeters
-     gap_tall$GapMin[gap_tall$Measure == 2] <-
+    # Convert GapMin from inches to centimeters
+    gap_tall$GapMin[gap_tall$Measure == 2] <-
       gap_tall$MinGap[gap_tall$Measure == 2] * 2.54
   }
   ## Note if this is Basal or Canopy Gap by removing gaps from the opposite type.
@@ -65,19 +80,32 @@ gap_cover <- function(gap_tall,
   }
 
   # Summarize total line length for the plot
-  gap_tall <- gap_tall %>%
-    # get the distinct PrimaryKey-LineKey combinations
-    dplyr::distinct(PrimaryKey, LineKey, .keep_all = TRUE) %>%
-    dplyr::group_by(!!!level) %>%
-    unique() %>%
-    dplyr::summarize(total_line_length = sum(LineLengthAmount)) %>%
+  if(!by_year){
+    gap_tall <- gap_tall %>%
+      # get the distinct PrimaryKey-LineKey combinations
+      dplyr::distinct(PrimaryKey, LineKey, .keep_all = TRUE) %>%
+      dplyr::group_by(!!!level) %>%
+      unique() %>%
+      dplyr::summarize(total_line_length = sum(LineLengthAmount)) %>%
 
-    # Merge back with original gap data
-    dplyr::left_join(gap_tall, .)
+      # Merge back with original gap data
+      dplyr::left_join(gap_tall, .)
+  }
+  if(by_year){
+    gap_tall <- gap_tall %>%
+      # get the distinct PrimaryKey-LineKey combinations
+      dplyr::distinct(PrimaryKey, LineKey, Year, .keep_all = TRUE) %>%
+      dplyr::group_by(!!!level) %>%
+      unique() %>%
+      dplyr::summarize(total_line_length = sum(LineLengthAmount)) %>%
+
+      # Merge back with original gap data
+      dplyr::left_join(gap_tall, .)
+  }
 
   # Find the interval class for each gap
-  breaks <- c(breaks, 100000)
-  gap_tall$interval <- cut(gap_tall$Gap, breaks = breaks, right = FALSE)
+  breaks1 <- c(breaks, 100000)
+  gap_tall$interval <- cut(gap_tall$Gap, breaks = breaks1, right = FALSE)
   gap_tall$interval <- gap_tall$interval %>%
     as.character() %>%
     replace(., is.na(.), "NoGap")
@@ -96,7 +124,7 @@ gap_cover <- function(gap_tall,
 
   # Subset the fields we need to output
   gap_summary <- gap_summary %>%
-    dplyr::select(PrimaryKey, total_line_length, interval, n, length, percent)
+    dplyr::select(!!!level, total_line_length, interval, n, length, percent)
 
   # Convert to wide format
   percent <- gap_summary %>%
@@ -112,33 +140,28 @@ gap_cover <- function(gap_tall,
 
   ## If tall=FALSE, then convert to wide format
   if (!tall) {
-    gap_summary <- list("percent" = percent, "n" = n, "length" = length)
+    gap_summary_out <- list("percent" = percent, "n" = n, "length" = length)
   } else { # Convert back to tall, this adds zeros in needed columns
-    gap_summary <- percent %>% tidyr::gather(
+    gap_summary_out <- percent %>% tidyr::gather(
       key = gap_class,
       value = percent,
-      -PrimaryKey,
-      -total_line_length
+      -(PrimaryKey:total_line_length)
     )
-    gap_summary <- n %>%
+    gap_summary_out <- n %>%
       tidyr::gather(
         key = gap_class,
         value = n,
-        -PrimaryKey,
-        -total_line_length
+        -(PrimaryKey:total_line_length)
       ) %>%
-      merge(gap_summary, allow.cartesian = TRUE)
-    gap_summary <- length %>%
+      merge(gap_summary_out, allow.cartesian = TRUE)
+    gap_summary_out <- length %>%
       tidyr::gather(
         key = gap_class,
         value = length,
-        -PrimaryKey,
-        -total_line_length
+        -(PrimaryKey:total_line_length)
       ) %>%
-      merge(gap_summary, allow.cartesian = TRUE)
+      merge(gap_summary_out, allow.cartesian = TRUE)
   }
 
-  return(gap_summary)
+  return(gap_summary_out)
 }
-
-
