@@ -8,22 +8,22 @@
 #' indicators calculated, and because it allows the user to input a separate
 #' species file.
 #' @param header Data frame. Use the data frame from the \code{header_build()}
-#'  output. Must be a .Rdata file.
+#' output. Must be a .Rdata file.
 #' @param lpi_tall Character. File path to a tall/long-format data frame. Use the data frame
-#'   from the \code{gather_lpi()} output. Must be a .Rdata file.
+#' from the \code{gather_lpi()} output. Must be a .Rdata file.
 #' @param species_file Character. The full file path (including file extension)
 #' to the file containing the species list
 #' @param source Character. Specifies data source, "AIM", "LMF", "I&M", "DIMA"
 #' @param overwrite_generic_species Logical. Updates attributes of generic species
 #' codes to those contained in tblSpeciesGeneric.Defaults to \code{FALSE}.
 #' @param by_year Logical. If \code{TRUE} then results will be reported further
-#'   grouped by year using the \code{FormDate} field from the data forms.
-#'   Defaults to \code{TRUE}.
-#' @export
-
+#' grouped by year using the \code{FormDate} field from the data forms.
+#' Defaults to \code{TRUE}.
+#' @return A data frame of indicator values
 
 
 # Calculate the LPI indicators
+#' @export lpi_calc_usgs
 lpi_calc_usgs <- function(header,
                           lpi_tall,
                           species_file,
