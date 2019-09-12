@@ -106,8 +106,8 @@ accumulated_species <- function (lpi_tall,
   # if a species list is provided, join to species list
   if (species_file != "") {
     all_species_header <- species_join(data = all_species_header,
-                                           data_code = "Species",
-                                           species_file = species_file) %>%
+                                       data_code = "Species",
+                                       species_file = species_file) %>%
       dplyr::select(PrimaryKey,
                     PlotID,
                     DBKey,
@@ -127,4 +127,3 @@ accumulated_species <- function (lpi_tall,
 
 
 }
-
