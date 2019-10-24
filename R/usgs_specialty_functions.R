@@ -93,6 +93,7 @@ lpi_calc_usgs <- function(header,
 
   # Assign string replacements
   between.plant.replace <- c(
+    "AL" = "HerbLitter",
     "\\bL\\b" = "HerbLitter",
     "HL" = "HerbLitter",
     "AM" = "HerbLitter",
