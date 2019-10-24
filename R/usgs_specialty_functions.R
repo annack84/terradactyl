@@ -140,23 +140,42 @@ lpi_calc_usgs <- function(header,
 
   # Because the renaming processing lumps categories,
   # we need to get a summed value (e.g., Soil =S+FG+LM_CM+AG)
-  between.plant.cover <- between.plant.cover %>%
-    dplyr::group_by(PrimaryKey, indicator) %>%
-    dplyr::summarise(percent = sum(percent))
+  if(!by_year){
+    between.plant.cover <- between.plant.cover %>%
+      dplyr::group_by(PrimaryKey, indicator) %>%
+      dplyr::summarise(percent = sum(percent))
 
-  # Add a Total Litter Indicator
-  between.plant.cover <- between.plant.cover %>%
-    # Filter Litter Indicators
-    dplyr::filter(grepl(pattern = "Litter", x = indicator)) %>%
-    # Sum all indicator hits
-    dplyr::group_by(PrimaryKey) %>%
-    dplyr::summarize(
-      indicator = "FH_TotalLitterCover",
-      percent = sum(percent)
-    ) %>%
-    # Add back to the rest of the between plant cover indicators
-    dplyr::bind_rows(between.plant.cover, .)
+    # Add a Total Litter Indicator
+    between.plant.cover <- between.plant.cover %>%
+      # Filter Litter Indicators
+      dplyr::filter(grepl(pattern = "Litter", x = indicator)) %>%
+      # Sum all indicator hits
+      dplyr::group_by(PrimaryKey) %>%
+      dplyr::summarize(
+        indicator = "FH_TotalLitterCover",
+        percent = sum(percent)
+      ) %>%
+      # Add back to the rest of the between plant cover indicators
+      dplyr::bind_rows(between.plant.cover, .)
+  }
+  if(by_year){
+    between.plant.cover <- between.plant.cover %>%
+      dplyr::group_by(PrimaryKey, Year, indicator) %>%
+      dplyr::summarise(percent = sum(percent))
 
+    # Add a Total Litter Indicator
+    between.plant.cover <- between.plant.cover %>%
+      # Filter Litter Indicators
+      dplyr::filter(grepl(pattern = "Litter", x = indicator)) %>%
+      # Sum all indicator hits
+      dplyr::group_by(PrimaryKey, Year) %>%
+      dplyr::summarize(
+        indicator = "FH_TotalLitterCover",
+        percent = sum(percent)
+      ) %>%
+      # Add back to the rest of the between plant cover indicators
+      dplyr::bind_rows(between.plant.cover, .)
+  }
 
   # Species Group Cover ----
   # Set the replacement values for valid indicator names ----
@@ -420,7 +439,9 @@ lpi_calc_usgs <- function(header,
                       string = .,
                       pattern = "AH_SagebrushLiveCover",
                       replacement = "AH_SagebrushCover_Live"
-                    ))
+                    )) %>%
+    # Remove NA cover lines
+    dplyr::filter(., !indicator=="AH_NACover")
 
 
 
@@ -616,6 +637,7 @@ lpi_calc_usgs <- function(header,
   ) %>%
     # Spread to a wide format
     tidyr::spread(key = indicator, value = percent, fill = 0)
+
 
 
   #   SageBrush Shape, this is dependent on Shrub shape existing ----
