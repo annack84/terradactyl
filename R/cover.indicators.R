@@ -3,6 +3,12 @@
 #' @param lpi_tall A tall/long-format data frame. Use the data frame \code{"layers"} from the \code{gather.lpi()} output.
 #' @param by_year Logical. If \code{TRUE} then results will be reported further grouped by year using the \code{DateModified} field from the data forms. Defaults to \code{FALSE}.
 #' @param by_line Logical. If \code{TRUE} then results will be reported further grouped by line using the \code{LineID} and \code{LineKey} fields from the data forms. Defaults to \code{FALSE}.
+#' @param by_sampleperiod Numeric >=\code{0} indicating the number of days in
+#' the desired sampling window. If >\code{0}, results will be reported further
+#' grouped by sampling period, where \code{FormDate} values for each plot that
+#' fall within the given number of days of each other are considered a single
+#' sampling period. If =\code{0}, no sample period grouping is performed.
+#' Defaults to \code{0}.
 #' @param tall Logical. If \code{TRUE} then output will be in tall format
 #' @param hit String. If \code{"first"} then only top LPI hits are included. If \code{"any"} then any hit values are included.
 #' @param ... Optional bare variable names. Names of variables to include as part of grouping e.g. \code{GrowthHabitSub} to calculate percent cover by growth habits or \code{GrowthHabitSub, Duration} to calculate percent cover for categories like perennial forbs, annual graminoids, etc.
@@ -18,13 +24,15 @@
 pct_cover_between_plant <- function(lpi_tall,
                                     tall = FALSE,
                                     by_year = FALSE,
-                                    by_line = FALSE) {
+                                    by_line = FALSE,
+                                    by_sampleperiod = 0) {
   # Calculate between plant cover
   summary <- pct_cover(lpi_tall,
     tall = TRUE,
     hit = "first",
     by_year = by_year,
     by_line = by_line,
+    by_sampleperiod = by_sampleperiod,
     code
   ) %>%
     # Remove all layer codes that are >=3 codes (i.e., species codes)
@@ -57,13 +65,15 @@ pct_cover_between_plant <- function(lpi_tall,
 pct_cover_all_ground <- function(lpi_tall,
                                  tall = FALSE,
                                  by_year = FALSE,
-                                 by_line = FALSE) {
+                                 by_line = FALSE,
+                                 by_sampleperiod = 0) {
   # Calculate between plant cover
   summary <- pct_cover(lpi_tall,
     tall = TRUE,
     hit = "basal",
     by_year = by_year,
     by_line = by_line,
+    by_sampleperiod = by_sampleperiod,
     code
   ) %>%
     # Remove all layer codes that are >=3 codes (i.e., species codes)
@@ -96,13 +106,15 @@ pct_cover_all_ground <- function(lpi_tall,
 pct_cover_total_foliar <- function(lpi_tall,
                                    tall = FALSE,
                                    by_year = FALSE,
-                                   by_line = FALSE) {
+                                   by_line = FALSE,
+                                   by_sampleperiod = 0) {
   # Calculate between plant cover
   summary <- pct_cover(lpi_tall,
     tall = TRUE,
     hit = "first",
     by_year = by_year,
     by_line = by_line,
+    by_sampleperiod = by_sampleperiod,
     code
   ) %>%
     # Remove all layer codes that are < 3 codes (i.e., non-species codes)
@@ -141,13 +153,15 @@ pct_cover_total_foliar <- function(lpi_tall,
 pct_cover_bare_soil <- function(lpi_tall,
                                 tall = FALSE,
                                 by_year = FALSE,
-                                by_line = FALSE) {
+                                by_line = FALSE,
+                                by_sampleperiod = 0) {
   # Calculate between plant cover
   summary <- pct_cover(lpi_tall,
     tall = TRUE,
     hit = "first",
     by_year = by_year,
     by_line = by_line,
+    by_sampleperiod = by_sampleperiod,
     code
   ) %>%
     # Find all of the first hit "S" codes
@@ -179,13 +193,15 @@ pct_cover_bare_soil <- function(lpi_tall,
 pct_cover_litter <- function(lpi_tall,
                              tall = FALSE,
                              by_year = FALSE,
-                             by_line = FALSE) {
+                             by_line = FALSE,
+                             by_sampleperiod = 0) {
   # Calculate between plant cover
   summary <- pct_cover(lpi_tall,
     tall = TRUE,
     hit = "any",
     by_year = by_year,
     by_line = by_line,
+    by_sampleperiod = by_sampleperiod,
     code
   ) %>%
     # Remove all layer codes that are <3 codes (i.e., non-species codes)
@@ -221,6 +237,7 @@ pct_cover_live <- function(lpi_tall,
                            by_year = FALSE,
                            by_line = FALSE,
                            hit = "any",
+                           by_sampleperiod = 0,
                            ...) {
   grouping_variables <- rlang::quos(...)
   # summarize by checkbox and pre-assigned grouping variables
@@ -229,6 +246,7 @@ pct_cover_live <- function(lpi_tall,
     hit = hit,
     by_year = by_year,
     by_line = by_line,
+    by_sampleperiod = by_sampleperiod,
     chckbox,
     !!!grouping_variables
   )
@@ -277,12 +295,14 @@ pct_cover_species <- function(lpi_tall,
                               tall = TRUE,
                               by_year = FALSE,
                               by_line = FALSE,
-                              hit = "any") {
+                              hit = "any",
+                              by_sampleperiod = by_sampleperiod) {
   summary <- pct_cover(lpi_tall,
     tall = TRUE,
     hit = hit,
     by_year = by_year,
     by_line = by_line,
+    by_sampleperiod = by_sampleperiod,
     code
   )
 

@@ -5,7 +5,8 @@
 \title{Line-point intercept indicator calculations}
 \usage{
 lpi_calc_usgs(header, lpi_tall, species_file, source,
-  overwrite_generic_species = FALSE, by_year = TRUE)
+  overwrite_generic_species = FALSE, by_year = TRUE,
+  by_sampleperiod = 0)
 }
 \arguments{
 \item{header}{Data frame. Use the data frame from the \code{header_build()}
@@ -25,6 +26,13 @@ codes to those contained in tblSpeciesGeneric.Defaults to \code{FALSE}.}
 \item{by_year}{Logical. If \code{TRUE} then results will be reported further
 grouped by year using the \code{FormDate} field from the data forms.
 Defaults to \code{TRUE}.}
+
+\item{by_sampleperiod}{Numeric >=\code{0} indicating the number of days in
+the desired sampling window. If >\code{0}, results will be reported further
+grouped by sampling period, where \code{FormDate} values for each plot that
+fall within the given number of days of each other are considered a single
+sampling period. If =\code{0}, no sample period grouping is performed.
+Defaults to \code{0}.}
 }
 \value{
 A \code{tbl} of indicators of either tall or wide format.

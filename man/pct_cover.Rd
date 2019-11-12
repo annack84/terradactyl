@@ -5,7 +5,7 @@
 \title{Percent cover}
 \usage{
 pct_cover(lpi_tall, tall = FALSE, hit = "any", by_year = FALSE,
-  by_line = FALSE, ...)
+  by_sampleperiod = 0, by_line = FALSE, ...)
 }
 \arguments{
 \item{lpi_tall}{A tall/long-format data frame. Use the data frame
@@ -26,6 +26,13 @@ surface hit will be used to calculate cover. Defaults to \code{"any"}.}
 \item{by_year}{Logical. If \code{TRUE} then results will be reported further
 grouped by year using the \code{FormDate} field from the data forms.
 Defaults to \code{FALSE}.}
+
+\item{by_sampleperiod}{Numeric >=\code{0} indicating the number of days in
+the desired sampling window. If >\code{0}, results will be reported further
+grouped by sampling period, where \code{FormDate} values for each plot that
+fall within the given number of days of each other are considered a single
+sampling period. If =\code{0}, no sample period grouping is performed.
+Defaults to \code{0}.}
 
 \item{by_line}{Logical. If \code{TRUE} then results will be reported further
 grouped by line using the \code{LineID} and \code{LineKey} fields from the
