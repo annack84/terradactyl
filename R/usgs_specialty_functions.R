@@ -19,6 +19,12 @@
 #' @param by_year Logical. If \code{TRUE} then results will be reported further
 #' grouped by year using the \code{FormDate} field from the data forms.
 #' Defaults to \code{TRUE}.
+#' @param by_sampleperiod Numeric >=\code{0} indicating the number of days in
+#' the desired sampling window. If >\code{0}, results will be reported further
+#' grouped by sampling period, where \code{FormDate} values for each plot that
+#' fall within the given number of days of each other are considered a single
+#' sampling period. If =\code{0}, no sample period grouping is performed.
+#' Defaults to \code{0}.
 #' @return A \code{tbl} of indicators of either tall or wide format.
 
 
@@ -30,7 +36,8 @@ lpi_calc_usgs <- function(header,
                           species_file,
                           source,
                           overwrite_generic_species=FALSE,
-                          by_year=TRUE) {
+                          by_year=TRUE,
+                          by_sampleperiod = 0) {
 
   # Join the lpi data to the header PrimaryKeys and add the StateSpecies Key
   lpi_tall_header <- readRDS(lpi_tall) %>%
@@ -78,7 +85,8 @@ lpi_calc_usgs <- function(header,
   total_foliar <- pct_cover_total_foliar(
     lpi_tall = lpi_species,
     tall = TRUE,
-    by_year = by_year
+    by_year = by_year,
+    by_sampleperiod = by_sampleperiod
   )
 
   # Calculate between plant cover (includes bare soil) ----
@@ -86,7 +94,8 @@ lpi_calc_usgs <- function(header,
     lpi_tall = lpi_species,
     by_year = by_year,
     by_line = FALSE,
-    tall = TRUE
+    tall = TRUE,
+    by_sampleperiod = by_sampleperiod
   )
 
   # Clean up indicator names so they are compatible with the AIM.gdb schema
@@ -227,6 +236,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Noxious, Duration, GrowthHabitSub
     ),
     # cover by Native, Duration, and GrowthHabitSub combination
@@ -235,6 +245,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Native, Duration, GrowthHabitSub
     ),
     # cover by PhotosyntheticPathway, Noxious, Duration, and GrowthHabitSub combination
@@ -243,6 +254,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Noxious, Duration, GrowthHabitSub
     ),
     # cover by PhotosyntheticPathway, Native, Duration, and GrowthHabitSub combination
@@ -251,6 +263,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Native, Duration, GrowthHabitSub
     ),
     # cover by PhotosyntheticPathway, Duration, and GrowthHabitSub combination
@@ -259,6 +272,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Duration, GrowthHabitSub
     ),
     # Add the indicators are only based on Duration and GrowthHabitSub only
@@ -267,6 +281,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Duration, GrowthHabitSub
     ),
     # Cover by GrowthHabitSub only
@@ -275,6 +290,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               GrowthHabitSub
     ),
     # Cover by Noxious and GrowthHabitSub combo
@@ -283,6 +299,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Noxious, GrowthHabitSub
     ),
     # Cover by Native and GrowthHabitSub combo
@@ -291,6 +308,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Native, GrowthHabitSub
     ),
     # Cover by PhotosyntheticPathway, Noxious and GrowthHabitSub combo
@@ -299,6 +317,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Noxious, GrowthHabitSub
     ),
     # Cover by PhotosyntheticPathway, Native and GrowthHabitSub combo
@@ -307,6 +326,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Native, GrowthHabitSub
     ),
     # Cover by PhotosyntheticPathway and GrowthHabitSub combo
@@ -315,6 +335,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, GrowthHabitSub
     ),
     # Cover by Noxious status
@@ -323,6 +344,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Noxious
     ),
     # Cover by PhotosyntheticPathway status
@@ -331,6 +353,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway
     ),
     # Cover by Native status
@@ -339,6 +362,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Native
     )%>% dplyr::mutate(indicator = paste(indicator, ".", sep = "")),
 
@@ -349,6 +373,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Noxious, Duration, GrowthHabit
     ),
     # Cover by Native, Duration, GrowthHabit status
@@ -357,6 +382,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Native, Duration, GrowthHabit
     ),
     # Cover by PhotosyntheticPathway, Noxious, Duration, GrowthHabit status
@@ -365,6 +391,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Noxious, Duration, GrowthHabit
     ),
     # Cover by PhotosyntheticPathway, Native, Duration, GrowthHabit status
@@ -373,6 +400,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Native, Duration, GrowthHabit
     ),
     # Cover by PhotosyntheticPathway, Duration, GrowthHabit status
@@ -381,6 +409,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Duration, GrowthHabit
     ),
 
@@ -390,6 +419,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               SG_Group
     ),
 
@@ -399,6 +429,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PinyonJuniper
     ),
 
@@ -408,6 +439,7 @@ lpi_calc_usgs <- function(header,
               hit = "any",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Duration, GrowthHabit
     )
   )
@@ -422,6 +454,7 @@ lpi_calc_usgs <- function(header,
                 hit = "any",
                 by_year = by_year,
                 by_line = FALSE,
+                by_sampleperiod = by_sampleperiod,
                 SG_Group, chckbox
       )
     ) }
@@ -454,6 +487,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Noxious, Duration, GrowthHabitSub
     ),
     # cover by Native, Duration, and GrowthHabitSub combination
@@ -462,6 +496,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Native, Duration, GrowthHabitSub
     ),
     # cover by PhotosyntheticPathway, Noxious, Duration, and GrowthHabitSub combination
@@ -470,6 +505,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Noxious, Duration, GrowthHabitSub
     ),
     # cover by PhotosyntheticPathway, Native, Duration, and GrowthHabitSub combination
@@ -478,6 +514,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Native, Duration, GrowthHabitSub
     ),
     # cover by PhotosyntheticPathway, Duration, and GrowthHabitSub combination
@@ -486,6 +523,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Duration, GrowthHabitSub
     ),
     # Add the indicators are only based on Duration and GrowthHabitSub only
@@ -494,6 +532,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Duration, GrowthHabitSub
     ),
     # Cover by GrowthHabitSub only
@@ -502,6 +541,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               GrowthHabitSub
     ),
     # Cover by Noxious and GrowthHabitSub combo
@@ -510,6 +550,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Noxious, GrowthHabitSub
     ),
     # Cover by Native and GrowthHabitSub combo
@@ -518,6 +559,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Native, GrowthHabitSub
     ),
     # Cover by PhotosyntheticPathway, Noxious and GrowthHabitSub combo
@@ -526,6 +568,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Noxious, GrowthHabitSub
     ),
     # Cover by PhotosyntheticPathway, Native and GrowthHabitSub combo
@@ -534,6 +577,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Native, GrowthHabitSub
     ),
     # Cover by PhotosyntheticPathway and GrowthHabitSub combo
@@ -542,6 +586,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, GrowthHabitSub
     ),
     # Cover by Noxious status
@@ -550,6 +595,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Noxious
     ),
     # Cover by Native status
@@ -558,6 +604,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Native
     ),
     # Cover by PhotosyntheticPathway status
@@ -566,6 +613,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway
     ),
     # Cover by Noxious, Duration, GrowthHabit status
@@ -574,6 +622,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Noxious, Duration, GrowthHabit
     ),
     # Cover by Native, Duration, GrowthHabit status
@@ -582,6 +631,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               Native, Duration, GrowthHabit
     ),
     # Cover by PhotosyntheticPathway, Noxious, Duration, GrowthHabit status
@@ -590,6 +640,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Noxious, Duration, GrowthHabit
     ),
     # Cover by PhotosyntheticPathway, Native, Duration, GrowthHabit status
@@ -598,6 +649,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Native, Duration, GrowthHabit
     ),
     # Cover by PhotosyntheticPathway, Duration, GrowthHabit status
@@ -606,6 +658,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               PhotosyntheticPathway, Duration, GrowthHabit
     ),
     # Sage Grouse Groupings
@@ -614,6 +667,7 @@ lpi_calc_usgs <- function(header,
               hit = "first",
               by_year = by_year,
               by_line = FALSE,
+              by_sampleperiod = by_sampleperiod,
               SG_Group
     )
   )
@@ -644,7 +698,7 @@ lpi_calc_usgs <- function(header,
   #   SageBrush Shape, this is dependent on Shrub shape existing ----
   # TODO Need to check this with sagebrush state data
 
-  # NEED TO ADD BY YEAR FUNCTIONALITY IF USING FOR USGS INDICATORS!
+  # NEED TO ADD BY YEAR and BY SAMPLE PERIOD FUNCTIONALITY IF USING FOR USGS INDICATORS!
   sagebrush_shape_calc <- sagebrush_shape(
     lpi_tall = lpi_species,
     # NRI and LMF don't collect live v. dead
