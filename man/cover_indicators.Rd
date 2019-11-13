@@ -12,25 +12,25 @@
 \title{Percent Cover Indicators}
 \usage{
 pct_cover_between_plant(lpi_tall, tall = FALSE, by_year = FALSE,
-  by_line = FALSE)
+  by_line = FALSE, by_sampleperiod = 0)
 
 pct_cover_all_ground(lpi_tall, tall = FALSE, by_year = FALSE,
-  by_line = FALSE)
+  by_line = FALSE, by_sampleperiod = 0)
 
 pct_cover_total_foliar(lpi_tall, tall = FALSE, by_year = FALSE,
-  by_line = FALSE)
+  by_line = FALSE, by_sampleperiod = 0)
 
 pct_cover_bare_soil(lpi_tall, tall = FALSE, by_year = FALSE,
-  by_line = FALSE)
+  by_line = FALSE, by_sampleperiod = 0)
 
 pct_cover_litter(lpi_tall, tall = FALSE, by_year = FALSE,
-  by_line = FALSE)
+  by_line = FALSE, by_sampleperiod = 0)
 
 pct_cover_live(lpi_tall, tall = FALSE, by_year = FALSE,
-  by_line = FALSE, hit = "any", ...)
+  by_line = FALSE, hit = "any", by_sampleperiod = 0, ...)
 
 pct_cover_species(lpi_tall, tall = TRUE, by_year = FALSE,
-  by_line = FALSE, hit = "any")
+  by_line = FALSE, hit = "any", by_sampleperiod = by_sampleperiod)
 }
 \arguments{
 \item{lpi_tall}{A tall/long-format data frame. Use the data frame \code{"layers"} from the \code{gather.lpi()} output.}
@@ -40,6 +40,13 @@ pct_cover_species(lpi_tall, tall = TRUE, by_year = FALSE,
 \item{by_year}{Logical. If \code{TRUE} then results will be reported further grouped by year using the \code{DateModified} field from the data forms. Defaults to \code{FALSE}.}
 
 \item{by_line}{Logical. If \code{TRUE} then results will be reported further grouped by line using the \code{LineID} and \code{LineKey} fields from the data forms. Defaults to \code{FALSE}.}
+
+\item{by_sampleperiod}{Numeric >=\code{0} indicating the number of days in
+the desired sampling window. If >\code{0}, results will be reported further
+grouped by sampling period, where \code{FormDate} values for each plot that
+fall within the given number of days of each other are considered a single
+sampling period. If =\code{0}, no sample period grouping is performed.
+Defaults to \code{0}.}
 
 \item{hit}{String. If \code{"first"} then only top LPI hits are included. If \code{"any"} then any hit values are included.}
 
