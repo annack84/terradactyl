@@ -698,7 +698,7 @@ lpi_calc_usgs <- function(header,
   #   SageBrush Shape, this is dependent on Shrub shape existing ----
   # TODO Need to check this with sagebrush state data
 
-  # NEED TO ADD BY YEAR FUNCTIONALITY IF USING FOR USGS INDICATORS!
+  # NEED TO ADD BY YEAR and BY SAMPLE PERIOD FUNCTIONALITY IF USING FOR USGS INDICATORS!
   sagebrush_shape_calc <- sagebrush_shape(
     lpi_tall = lpi_species,
     # NRI and LMF don't collect live v. dead
