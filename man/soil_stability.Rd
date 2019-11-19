@@ -6,7 +6,7 @@
 \usage{
 soil_stability(soil_stability_tall, all = TRUE, cover = TRUE,
   uncovered = TRUE, all_cover_types = FALSE, tall = FALSE,
-  by_year = FALSE)
+  by_year = FALSE, by_sampleperiod = 0)
 }
 \arguments{
 \item{soil_stability_tall}{Dataframe Gathered soil stability data}

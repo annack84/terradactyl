@@ -26,26 +26,59 @@ gap_cover <- function(gap_tall,
                       breaks = c(20, 25, 51, 100, 200),
                       type = "canopy",
                       by_line = FALSE,
-                      by_year = FALSE){
+                      by_year = FALSE,
+                      by_sampleperiod = 0){
+  if (by_year & by_sampleperiod!=0) {
+    stop("Cannot use both by_year and by_sampleperiod. Set either by_year = TRUE
+         and by_sampleperiod = 0 to group by year, or by_year = FALSE and by_sampleperiod
+         as an integer number of days greater than 0")
+  }
+
+  if (by_sampleperiod<0) {
+    stop("Sample period must be a number of days >=0")
+  }
+
   # Create a year variable to group by for by_year = T
   if(by_year){
     gap_tall$Year <- lubridate::year(gap_tall$FormDate)
   }
 
-  # For how deep to group. Always by plot, sometimes by line, sometimes by year
-  if (by_line & !by_year) {
+  # Create a sample period variable to group by for by_sampleperiod = T
+  if(by_sampleperiod!=0){
+    gap_sampkeys <- gap_tall %>%
+      dplyr::select(PrimaryKey, FormDate) %>%
+      dplyr::distinct() %>%
+      dplyr::group_by(PrimaryKey) %>%
+      dplyr::arrange(FormDate) %>%
+      dplyr::mutate(DaysSincePrev = FormDate - dplyr::lag(x=FormDate, n=1)) %>%
+      dplyr::mutate(SamplePeriodStart = ifelse(test = DaysSincePrev>by_sampleperiod|is.na(DaysSincePrev), # NA values indicate the first sampling date for a given plot
+                                               yes = as.character(FormDate),
+                                               no = NA)) %>%
+      tidyr::fill(., SamplePeriodStart, .direction = "down")
+
+    gap_tall <- left_join(gap_tall, select(gap_sampkeys, -DaysSincePrev), by = c("PrimaryKey", "FormDate"))
+  }
+
+
+  # For how deep to group. Always by plot, sometimes by line, sometimes by year, sometimes by sample period
+  if (by_line & !by_year & by_sampleperiod==0) {
     level <- rlang::quos(PrimaryKey, LineKey)
   }
   if(by_line & by_year){
     level <- rlang::quos(PrimaryKey, LineKey, Year)
   }
+  if(by_line & by_sampleperiod!=0){
+    level <- rlang::quos(PrimaryKey, LineKey, SamplePeriodStart)
+  }
   if(!by_line & by_year){
     level <- rlang::quos(PrimaryKey, Year)
   }
-  if(!by_line & !by_year) {
+  if(!by_line & by_sampleperiod!=0){
+    level <- rlang::quos(PrimaryKey, SamplePeriodStart)
+  }
+  if(!by_line & !by_year & by_sampleperiod==0) {
     level <- rlang::quos(PrimaryKey)
   }
-
 
   ## Convert the line lengths to the same units as the gaps
   # if metric (gap$Measure==1) then multiply by 100 to convert to centimeters
@@ -80,7 +113,7 @@ gap_cover <- function(gap_tall,
   }
 
   # Summarize total line length for the plot
-  if(!by_year){
+  if(!by_year & by_sampleperiod==0){
     gap_tall <- gap_tall %>%
       # get the distinct PrimaryKey-LineKey combinations
       dplyr::distinct(PrimaryKey, LineKey, .keep_all = TRUE) %>%
@@ -95,6 +128,17 @@ gap_cover <- function(gap_tall,
     gap_tall <- gap_tall %>%
       # get the distinct PrimaryKey-LineKey combinations
       dplyr::distinct(PrimaryKey, LineKey, Year, .keep_all = TRUE) %>%
+      dplyr::group_by(!!!level) %>%
+      unique() %>%
+      dplyr::summarize(total_line_length = sum(LineLengthAmount)) %>%
+
+      # Merge back with original gap data
+      dplyr::left_join(gap_tall, .)
+  }
+  if(by_sampleperiod>0){
+    gap_tall <- gap_tall %>%
+      # get the distinct PrimaryKey-LineKey combinations
+      dplyr::distinct(PrimaryKey, LineKey, SamplePeriodStart, .keep_all = TRUE) %>%
       dplyr::group_by(!!!level) %>%
       unique() %>%
       dplyr::summarize(total_line_length = sum(LineLengthAmount)) %>%
