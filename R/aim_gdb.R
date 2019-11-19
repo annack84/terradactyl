@@ -599,6 +599,7 @@ height_calc <- function(header, height_tall,
                         by_year = FALSE,
                         by_sampleperiod = 0,
                         tall = FALSE,
+                        overwrite_generic_species = TRUE,
                         source) {
   # gather tall height
   height <- readRDS(height_tall) %>%
@@ -611,7 +612,7 @@ height_calc <- function(header, height_tall,
     data = height,
     data_code = "Species",
     species_file = species_file,
-    overwrite_generic_species = TRUE
+    overwrite_generic_species = overwrite_generic_species
   )
 
   # Correct the Non-Woody to NonWoody
