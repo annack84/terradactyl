@@ -755,7 +755,7 @@ height_calc <- function(header, height_tall,
     )
     return(height_calc_wide)
   }else{
-    return(height_calc())
+    return(height_calc)
   }
 }
 
