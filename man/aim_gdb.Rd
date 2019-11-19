@@ -26,7 +26,7 @@ gap_calc(header, gap_tall)
 
 height_calc(header, height_tall, species_file = species_file,
   by_line = FALSE, by_year = FALSE, by_sampleperiod = 0,
-  tall = FALSE, source)
+  tall = FALSE, overwrite_generic_species = TRUE, source)
 
 spp_inventory_calc(header, spp_inventory_tall, species_file)
 
