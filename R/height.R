@@ -93,7 +93,8 @@ mean_height <- function(height_tall,
       tidyr::unite(indicator,
         !!!grouping_variables,
         sep = "."
-      )
+      ) %>%
+      dplyr::ungroup()
 
     summary <- summary[!grepl(summary$indicator, pattern = "NA.|.NA"), ]
   }
@@ -110,7 +111,8 @@ mean_height <- function(height_tall,
     summary <- height_tall_spread %>%
       dplyr::group_by(!!!level, !!!grouping_variables) %>%
       dplyr::summarize(max_height = mean(max)) %>%
-      dplyr::filter(!grepl(max_height, pattern = "^[NA.]{0,100}NA$"))
+      dplyr::filter(!grepl(max_height, pattern = "^[NA.]{0,100}NA$")) %>%
+      dplyr::ungroup()
   }
 
 
