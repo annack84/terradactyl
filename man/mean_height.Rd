@@ -5,7 +5,8 @@
 \title{Calculate the vegetation height}
 \usage{
 mean_height(height_tall, method = "mean", omit_zero = TRUE,
-  by_line = FALSE, tall = FALSE, ...)
+  by_line = FALSE, by_year = FALSE, by_sampleperiod = 0,
+  tall = FALSE, ...)
 }
 \arguments{
 \item{height_tall}{A tall/long-format data frame. Use the data frame \code{"height"} from the \code{gather.lpi()} output.}

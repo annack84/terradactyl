@@ -11,6 +11,8 @@ mean_height <- function(height_tall,
                         method = "mean",
                         omit_zero = TRUE,
                         by_line = FALSE,
+                        by_year = FALSE,
+                        by_sampleperiod = 0,
                         tall = FALSE,
                         ...) {
   ## Get a list of the variables the user wants to group by.
@@ -23,15 +25,58 @@ mean_height <- function(height_tall,
   if (!(method %in% c("mean", "max"))) {
     stop("method must be either 'mean' or 'max'.")
   }
+  if (by_year & by_sampleperiod!=0) {
+    stop("Cannot use both by_year and by_sampleperiod. Set either by_year = TRUE
+         and by_sampleperiod = 0 to group by year, or by_year = FALSE and by_sampleperiod
+         as an integer number of days greater than 0")
+  }
 
-  # For grouping by line
-  if (by_line) {
+  if (by_sampleperiod<0) {
+    stop("Sample period must be a number of days >=0")
+  }
+
+  # add Year column if grouping by year
+  if(by_year){
+    height_tall$Year <- lubridate::year(height_tall$FormDate)
+  }
+
+  # Create a sample period variable to group by for by_sampleperiod = T
+  if(by_sampleperiod!=0){
+    height_sampkeys <- height_tall %>%
+      dplyr::select(PrimaryKey, FormDate) %>%
+      dplyr::distinct() %>%
+      dplyr::group_by(PrimaryKey) %>%
+      dplyr::arrange(FormDate) %>%
+      dplyr::mutate(DaysSincePrev = FormDate - dplyr::lag(x=FormDate, n=1)) %>%
+      dplyr::mutate(SamplePeriodStart = ifelse(test = DaysSincePrev>by_sampleperiod|is.na(DaysSincePrev), # NA values indicate the first sampling date for a given plot
+                                               yes = as.character(FormDate),
+                                               no = NA)) %>%
+      tidyr::fill(., SamplePeriodStart, .direction = "down")
+
+    height_tall <- left_join(height_tall, select(height_sampkeys, -DaysSincePrev), by = c("PrimaryKey", "FormDate"))
+  }
+
+  # For how deep to group. Always by plot, sometimes by line, sometimes by year, sometimes by sample period
+  if (by_line & !by_year & by_sampleperiod==0) {
     level <- rlang::quos(PrimaryKey, LineKey)
-  } else {
+  }
+  if(by_line & by_year){
+    level <- rlang::quos(PrimaryKey, LineKey, Year)
+  }
+  if(by_line & by_sampleperiod!=0){
+    level <- rlang::quos(PrimaryKey, LineKey, SamplePeriodStart)
+  }
+  if(!by_line & by_year){
+    level <- rlang::quos(PrimaryKey, Year)
+  }
+  if(!by_line & by_sampleperiod!=0){
+    level <- rlang::quos(PrimaryKey, SamplePeriodStart)
+  }
+  if(!by_line & !by_year & by_sampleperiod==0) {
     level <- rlang::quos(PrimaryKey)
   }
 
-  # If height of zer0 is dropped by the calculation, filter out zeros
+  # If height of zero is dropped by the calculation, filter out zeros
   if (omit_zero) {
     height_tall <- dplyr::filter(height_tall, Height != 0)
   }

@@ -595,6 +595,10 @@ gap_calc <- function(header, gap_tall) {
 # Calculate the Height indicators for AIM
 height_calc <- function(header, height_tall,
                         species_file = species_file,
+                        by_line = FALSE,
+                        by_year = FALSE,
+                        by_sampleperiod = 0,
+                        tall = FALSE,
                         source) {
   # gather tall height
   height <- readRDS(height_tall) %>%
@@ -633,7 +637,9 @@ height_calc <- function(header, height_tall,
       height_tall = height_species,
       method = "mean",
       omit_zero = TRUE, # remove zeros from average height calcs
-      by_line = FALSE,
+      by_line = by_line,
+      by_year = by_year,
+      by_sampleperiod = by_sampleperiod,
       tall = TRUE,
       type
     ) %>% subset(indicator %in% c("woody", "herbaceous")),
@@ -643,7 +649,9 @@ height_calc <- function(header, height_tall,
       height_tall = height_species,
       method = "mean",
       omit_zero = TRUE, # remove zeros from average height calcs
-      by_line = FALSE,
+      by_line = by_line,
+      by_year = by_year,
+      by_sampleperiod = by_sampleperiod,
       tall = TRUE,
       GrowthHabitSub
     ) %>% subset(indicator %in% c("Forb", "Graminoid")),
@@ -653,7 +661,9 @@ height_calc <- function(header, height_tall,
       height_tall = height_species,
       method = "mean",
       omit_zero = TRUE, # remove zeros from average height calcs
-      by_line = FALSE,
+      by_line = by_line,
+      by_year = by_year,
+      by_sampleperiod = by_sampleperiod,
       tall = TRUE,
       Duration, GrowthHabitSub
     ) %>% subset(indicator %in% c("Perennial.Forb", "Perennial.Graminoid")),
@@ -663,7 +673,9 @@ height_calc <- function(header, height_tall,
       height_tall = height_species,
       method = "mean",
       omit_zero = TRUE, # remove zeros from average height calcs
-      by_line = FALSE,
+      by_line = by_line,
+      by_year = by_year,
+      by_sampleperiod = by_sampleperiod,
       tall = TRUE,
       pgpf
     ) %>% subset(indicator == "PerenForbGrass"),
@@ -673,7 +685,9 @@ height_calc <- function(header, height_tall,
       height_tall = height_species,
       method = "mean",
       omit_zero = TRUE, # remove zeros from average height calcs
-      by_line = FALSE,
+      by_line = by_line,
+      by_year = by_year,
+      by_sampleperiod = by_sampleperiod,
       tall = TRUE,
       Noxious, Duration, GrowthHabitSub
     ) %>% subset(indicator %in% c(
@@ -687,7 +701,9 @@ height_calc <- function(header, height_tall,
       height_tall = height_species,
       method = "mean",
       omit_zero = TRUE, # remove zeros from average height calcs
-      by_line = FALSE,
+      by_line = by_line,
+      by_year = by_year,
+      by_sampleperiod = by_sampleperiod,
       tall = TRUE,
       SG_Group
     ) %>% subset(indicator != "NA")
@@ -702,7 +718,9 @@ height_calc <- function(header, height_tall,
         height_tall = height_species,
         method = "mean",
         omit_zero = TRUE, # remove zeros from average height calcs
-        by_line = FALSE,
+        by_line = by_line,
+        by_year = by_year,
+        by_sampleperiod = by_sampleperiod,
         tall = TRUE,
         SG_Group, Chkbox
       ) %>% subset(indicator == "Sagebrush.0")
@@ -727,14 +745,17 @@ height_calc <- function(header, height_tall,
                     )) %>%
                     paste("Hgt_", ., "_Avg", sep = ""))
 
-  # Spread to wide format and return
-  height_calc_wide <- height_calc %>% tidyr::spread(
-    key = indicator,
-    value = mean_height,
-    fill = NA
-  )
-
-  return(height_calc_wide)
+  if(!tall){
+    # Spread to wide format and return
+    height_calc_wide <- height_calc %>% tidyr::spread(
+      key = indicator,
+      value = mean_height,
+      fill = NA
+    )
+    return(height_calc_wide)
+  }else{
+    return(height_calc())
+  }
 }
 
 
