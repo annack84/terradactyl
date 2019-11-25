@@ -130,6 +130,7 @@ lpi_calc_usgs <- function(header,
     "CM" = "BareSoil",
     "LM" = "BareSoil",
     "FG" = "BareSoil",
+    "PC" = "BareSoil",
     "BR" = "Bedrock",
     "\\bS\\b" = "BareSoil",
     "[[:punct:]]" = ""
@@ -150,7 +151,7 @@ lpi_calc_usgs <- function(header,
 
   # Because the renaming processing lumps categories,
   # we need to get a summed value (e.g., Soil =S+FG+LM_CM+AG)
-  if(!by_year){
+  if(!by_year & by_sampleperiod==0){
     between.plant.cover <- between.plant.cover %>%
       dplyr::group_by(PrimaryKey, indicator) %>%
       dplyr::summarise(percent = sum(percent))
@@ -179,6 +180,24 @@ lpi_calc_usgs <- function(header,
       dplyr::filter(grepl(pattern = "Litter", x = indicator)) %>%
       # Sum all indicator hits
       dplyr::group_by(PrimaryKey, Year) %>%
+      dplyr::summarize(
+        indicator = "FH_TotalLitterCover",
+        percent = sum(percent)
+      ) %>%
+      # Add back to the rest of the between plant cover indicators
+      dplyr::bind_rows(between.plant.cover, .)
+  }
+  if(by_sampleperiod>0){
+    between.plant.cover <- between.plant.cover %>%
+      dplyr::group_by(PrimaryKey, SamplePeriodStart, indicator) %>%
+      dplyr::summarise(percent = sum(percent))
+
+    # Add a Total Litter Indicator
+    between.plant.cover <- between.plant.cover %>%
+      # Filter Litter Indicators
+      dplyr::filter(grepl(pattern = "Litter", x = indicator)) %>%
+      # Sum all indicator hits
+      dplyr::group_by(PrimaryKey, SamplePeriodStart) %>%
       dplyr::summarize(
         indicator = "FH_TotalLitterCover",
         percent = sum(percent)
