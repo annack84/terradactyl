@@ -94,7 +94,7 @@ soil_stability <- function(soil_stability_tall,
   # Calculate mean rating for all cover types individually
   if (all_cover_types == TRUE) {
     soil_stability_rating[["all_cover_types"]] <- soil_stability_tall %>%
-      dplyr::group_by(., !!!level)%>%
+      dplyr::group_by(., !!!level, Veg)%>%
       dplyr::summarize(rating = mean(Rating)) %>%
       as.data.frame()
   }
