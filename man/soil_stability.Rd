@@ -15,14 +15,14 @@ soil_stability(soil_stability_tall, all = TRUE, cover = TRUE,
 
 \item{cover}{Logical. When \code{TRUE}, calculates soil stability for samples covered byperennial vegetation. Defaults to \code{TRUE}}
 
+\item{uncovered}{Logical. When \code{TRUE}, calculates soil stability for samples not covered by perennial vegetation. Defaults to \code{TRUE}}
+
 \item{all_cover_types}{Logical. When \code{TRUE}, calculates soil stability for each indidual cover type. Defaults to \code{FALSE}}
 
 \item{tall}{Logical. Indicates if output is tall/long or wide. Defaults to \code{TRUE}}
 
 \item{by_year}{Logical. If \code{TRUE} then results will be reported further
 grouped by year using the \code{FormDate} field from the data forms. Defaults to \code{FALSE}}
-
-\item{uncovered.}{Logical. When \code{TRUE}, calculates soil stability for samples not covered by perennial vegetation. Defaults to \code{TRUE}}
 }
 \value{
 Dataframe of calculated soil stability values by plot.

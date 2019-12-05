@@ -2,7 +2,7 @@
 #' @param soil_stability_tall Dataframe Gathered soil stability data
 #' @param all Logical. When \code{TRUE} Calculate soil stability for all samples. Defaults to \code{TRUE}
 #' @param cover Logical. When \code{TRUE}, calculates soil stability for samples covered byperennial vegetation. Defaults to \code{TRUE}
-#' @param uncovered. Logical. When \code{TRUE}, calculates soil stability for samples not covered by perennial vegetation. Defaults to \code{TRUE}
+#' @param uncovered Logical. When \code{TRUE}, calculates soil stability for samples not covered by perennial vegetation. Defaults to \code{TRUE}
 #' @param all_cover_types Logical. When \code{TRUE}, calculates soil stability for each indidual cover type. Defaults to \code{FALSE}
 #' @param tall Logical. Indicates if output is tall/long or wide. Defaults to \code{TRUE}
 #' @param by_year Logical. If \code{TRUE} then results will be reported further
