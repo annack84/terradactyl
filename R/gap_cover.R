@@ -98,7 +98,7 @@ gap_cover <- function(gap_tall,
 
     # Convert GapMin from inches to centimeters
     gap_tall$GapMin[gap_tall$Measure == 2] <-
-      gap_tall$MinGap[gap_tall$Measure == 2] * 2.54
+      gap_tall$GapMin[gap_tall$Measure == 2] * 2.54
   }
   ## Note if this is Basal or Canopy Gap by removing gaps from the opposite type.
   # "NA"s in RecType occur when there are no gaps
