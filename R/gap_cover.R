@@ -86,7 +86,7 @@ gap_cover <- function(gap_tall,
     100 * gap_tall$LineLengthAmount[gap_tall$Measure == 1]
 
   # if English (gap$Measure==2) then multiply by 12 to put the line length in inches,
-  if (unique(gap_tall$Measure) %in% 2) {
+  if (2 %in% unique(gap_tall$Measure)) {
 
     # Convert LineLengthAmount from inches to centimeters
     gap_tall$LineLengthAmount[gap_tall$Measure == 2] <-
