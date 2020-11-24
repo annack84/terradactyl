@@ -4,9 +4,15 @@
 \alias{lpi_calc_usgs}
 \title{Line-point intercept indicator calculations}
 \usage{
-lpi_calc_usgs(header, lpi_tall, species_file, source,
-  overwrite_generic_species = FALSE, by_year = TRUE,
-  by_sampleperiod = 0)
+lpi_calc_usgs(
+  header,
+  lpi_tall,
+  species_file,
+  source,
+  overwrite_generic_species = FALSE,
+  by_year = TRUE,
+  by_sampleperiod = 0
+)
 }
 \arguments{
 \item{header}{Data frame. Use the data frame from the \code{header_build()}

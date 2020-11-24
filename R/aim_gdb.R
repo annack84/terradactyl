@@ -764,7 +764,10 @@ height_calc <- function(header, height_tall,
 #' @export spp_inventory_calc
 #' @rdname aim_gdb
 # Calculate species inventory
-spp_inventory_calc <- function(header, spp_inventory_tall, species_file) {
+spp_inventory_calc <- function(header,
+                               spp_inventory_tall,
+                               species_file,
+                               overwrite_generic_species) {
   # tidy.species
   spp_inventory_tall <- readRDS(spp_inventory_tall) %>%
     # Join to the header to get the relevant PrimaryKeys and SpeciesSate
@@ -777,7 +780,7 @@ spp_inventory_calc <- function(header, spp_inventory_tall, species_file) {
     data = spp_inventory_tall,
     data_code = "Species",
     species_file = species_file,
-    overwrite_generic_species = TRUE
+    overwrite_generic_species = overwrite_generic_species
   )
 
   # Count the number of species present in each group
