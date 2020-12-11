@@ -247,7 +247,8 @@ pct_cover <- function(lpi_tall,
                         # Get all the other fields back
                         merge(
                           x = dplyr::distinct(dplyr::select(lpi_tall,
-                                                            "PrimaryKey",
+                                                            join_fields,
+                                                            #"PrimaryKey",
                                                             "LineKey",
                                                             "PointNbr",
                                                             "code",
